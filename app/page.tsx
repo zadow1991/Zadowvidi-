@@ -33,7 +33,7 @@ export default function Home() {
       : "Unbekannter Fehler"
   );
     }
-
+  }
         return (
     <main>
       <h1>VidAI Music Video Studio</h1>
