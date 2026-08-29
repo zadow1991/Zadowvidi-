@@ -16,11 +16,16 @@ export default function Home() {
         accept="audio/*"
         onChange={(e) => {
           const file = e.target.files?.[0];
-          if (file) setAudioName(file.name);
+
+          if (file) {
+            setAudioName(file.name);
+          }
         }}
       />
 
-      {audioName && <p>Ausgewählte Datei: {audioName}</p>}
+      {audioName && (
+        <p>Ausgewählte Datei: {audioName}</p>
+      )}
     </main>
   );
 }
