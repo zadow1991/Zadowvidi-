@@ -14,32 +14,27 @@ export default function Home() {
 
     setStatus("Video wird vorbereitet...");
 
-    const formData = new FormData();
-    formData.append("audio", audioFile);
-
     try {
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        body: formData,
-      });
+  const response = await fetch("/api/generate", {
+    method: "POST",
+  });
 
-      const data = await response.json();
+  const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Fehler bei der Videogenerierung");
-      }
-
-      setStatus("Video-Generierung gestartet!");
-    } catch (error) {
-      setStatus(
-        error instanceof Error
-          ? error.message
-          : "Unbekannter Fehler"
-      );
-    }
+  if (!response.ok) {
+    throw new Error(data.error || "Fehler bei der Videogenerierung");
   }
 
-  return (
+  setStatus("Video-Generierung gestartet!");
+} catch (error) {
+  setStatus(
+    error instanceof Error
+      ? error.message
+      : "Unbekannter Fehler"
+  );
+    }
+
+        return (
     <main>
       <h1>VidAI Music Video Studio</h1>
 
@@ -68,4 +63,4 @@ export default function Home() {
       {status && <p>{status}</p>}
     </main>
   );
-}
+  }
