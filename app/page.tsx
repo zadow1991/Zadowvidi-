@@ -3,7 +3,41 @@
 import { useState } from "react";
 
 export default function Home() {
-  const [audioName, setAudioName] = useState("");
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [status, setStatus] = useState("");
+
+  async function createVideo() {
+    if (!audioFile) {
+      setStatus("Bitte zuerst eine Audiodatei auswählen.");
+      return;
+    }
+
+    setStatus("Video wird vorbereitet...");
+
+    const formData = new FormData();
+    formData.append("audio", audioFile);
+
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Fehler bei der Videogenerierung");
+      }
+
+      setStatus("Video-Generierung gestartet!");
+    } catch (error) {
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : "Unbekannter Fehler"
+      );
+    }
+  }
 
   return (
     <main>
@@ -15,17 +49,23 @@ export default function Home() {
         type="file"
         accept="audio/*"
         onChange={(e) => {
-          const file = e.target.files?.[0];
-
-          if (file) {
-            setAudioName(file.name);
-          }
+          const file = e.target.files?.[0] || null;
+          setAudioFile(file);
+          setStatus("");
         }}
       />
 
-      {audioName && (
-        <p>Ausgewählte Datei: {audioName}</p>
+      {audioFile && (
+        <>
+          <p>Ausgewählte Datei: {audioFile.name}</p>
+
+          <button onClick={createVideo}>
+            🎬 Video erstellen
+          </button>
+        </>
       )}
+
+      {status && <p>{status}</p>}
     </main>
   );
 }
