@@ -23,26 +23,46 @@ export async function POST() {
         body: JSON.stringify({
           model: "gen4.5",
           promptText:
-            "A cinematic music video, dynamic camera movement, dramatic lighting, professional music video aesthetic",
+            "A cinematic western music video, dramatic desert landscape, lone cowboy, dynamic camera movement, cinematic lighting, professional music video aesthetic",
           ratio: "1280:720",
           duration: 5,
         }),
       }
     );
 
-    const data = await response.json();
+    const responseText = await response.text();
+
+    let data: unknown;
+
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = {
+        raw: responseText,
+      };
+    }
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data?.error || "Runway API Fehler", details: data },
+        {
+          error: "Runway API Fehler",
+          status: response.status,
+          details: data,
+        },
         { status: response.status }
       );
     }
 
     return NextResponse.json({
       success: true,
-      taskId: data.id,
+      taskId:
+        typeof data === "object" &&
+        data !== null &&
+        "id" in data
+          ? (data as { id: string }).id
+          : null,
       message: "Video-Generierung gestartet.",
+      details: data,
     });
   } catch (error) {
     return NextResponse.json(
