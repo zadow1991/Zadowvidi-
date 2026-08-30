@@ -23,9 +23,8 @@ export async function POST() {
         body: JSON.stringify({
           model: "gen4.5",
           promptText:
-            "A cinematic western music video, dramatic desert landscape, lone cowboy, dynamic camera movement, cinematic lighting, professional music video aesthetic",
+            "A cinematic western music video, dramatic desert landscape, lone cowboy riding through the sunset, dynamic camera movement, cinematic lighting, realistic film look",
           ratio: "1280:720",
-
           duration: 5,
         }),
       }
@@ -38,19 +37,17 @@ export async function POST() {
     try {
       data = JSON.parse(responseText);
     } catch {
-      data = {
-        raw: responseText,
-      };
+      data = { raw: responseText };
     }
 
     if (!response.ok) {
-  return NextResponse.json(
-    {
-      error: `Runway API Fehler (${response.status})`,
-      details: data,
-    },
-    { status: response.status }
-  );
+      return NextResponse.json(
+        {
+          error: `Runway API Fehler ${response.status}`,
+          details: data,
+        },
+        { status: response.status }
+      );
     }
 
     return NextResponse.json({
