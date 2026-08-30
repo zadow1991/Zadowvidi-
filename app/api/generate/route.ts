@@ -43,14 +43,13 @@ export async function POST() {
     }
 
     if (!response.ok) {
-      return NextResponse.json(
-        {
-          error: "Runway API Fehler",
-          status: response.status,
-          details: data,
-        },
-        { status: response.status }
-      );
+  return NextResponse.json(
+    {
+      error: `Runway API Fehler (${response.status})`,
+      details: data,
+    },
+    { status: response.status }
+  );
     }
 
     return NextResponse.json({
