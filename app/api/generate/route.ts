@@ -24,7 +24,7 @@ export async function POST() {
           model: "gen4.5",
           promptText:
             "A cinematic western music video, dramatic desert landscape, lone cowboy, dynamic camera movement, cinematic lighting, professional music video aesthetic",
-          ratio: "1280:768",
+          ratio: "1280:720",
 
           duration: 5,
         }),
