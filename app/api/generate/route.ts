@@ -3,10 +3,18 @@ import { NextResponse } from "next/server";
 export async function POST() {
   try {
     const apiKey = process.env.RUNWAYML_API_SECRET;
+    const imageUrl = process.env.RUNWAY_TEST_IMAGE_URL;
 
     if (!apiKey) {
       return NextResponse.json(
         { error: "RUNWAYML_API_SECRET fehlt." },
+        { status: 500 }
+      );
+    }
+
+    if (!imageUrl) {
+      return NextResponse.json(
+        { error: "RUNWAY_TEST_IMAGE_URL fehlt." },
         { status: 500 }
       );
     }
@@ -22,6 +30,7 @@ export async function POST() {
         },
         body: JSON.stringify({
           model: "gen4.5",
+          promptImage: imageUrl,
           promptText:
             "A cinematic western music video, dramatic desert landscape, lone cowboy riding through the sunset, dynamic camera movement, cinematic lighting, realistic film look",
           ratio: "1280:720",
@@ -43,7 +52,7 @@ export async function POST() {
     if (!response.ok) {
       return NextResponse.json(
         {
-          error: `Runway API Fehler ${response.status}`,
+          error: `Runway API Fehler (${response.status})`,
           details: data,
         },
         { status: response.status }
