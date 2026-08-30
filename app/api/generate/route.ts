@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import RunwayML, { TaskFailedError } from "@runwayml/sdk";
 
 export async function POST() {
   try {
@@ -11,63 +12,43 @@ export async function POST() {
       );
     }
 
-    const response = await fetch(
-      "https://api.dev.runwayml.com/v1/image_to_video",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-          "X-Runway-Version": "2024-11-06",
-        },
-        body: JSON.stringify({
-          model: "gen4.5",
-          promptText:
-            "A cinematic western music video, dramatic desert landscape, lone cowboy, dynamic camera movement, cinematic lighting",
-          ratio: "1280:720",
-          duration: 5,
-        }),
-      }
-    );
+    const client = new RunwayML({
+      apiKey,
+    });
 
-    const responseText = await response.text();
-
-    let data: unknown;
-
-    try {
-      data = JSON.parse(responseText);
-    } catch {
-      data = { raw: responseText };
-    }
-
-    if (!response.ok) {
-      return NextResponse.json(
-        {
-          error: `Runway API Fehler (${response.status})`,
-          details: data,
-        },
-        { status: response.status }
-      );
-    }
+    const task = await client.imageToVideo
+      .create({
+        model: "gen4.5",
+        promptText:
+          "A cinematic western music video, dramatic desert landscape, lone cowboy, dynamic camera movement, cinematic lighting, realistic film look",
+        ratio: "1280:720",
+        duration: 5,
+      })
+      .waitForTaskOutput();
 
     return NextResponse.json({
       success: true,
-      taskId:
-        typeof data === "object" &&
-        data !== null &&
-        "id" in data
-          ? (data as { id: string }).id
-          : null,
-      message: "Video-Generierung gestartet.",
-      details: data,
+      taskId: task.id,
+      videoUrl: task.output?.[0] ?? null,
+      message: "Video erfolgreich erstellt.",
     });
   } catch (error) {
+    if (error instanceof TaskFailedError) {
+      return NextResponse.json(
+        {
+          error: "Runway Video-Generierung fehlgeschlagen.",
+          details: error.taskDetails,
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
       {
         error:
           error instanceof Error
             ? error.message
-            : "Unbekannter Serverfehler",
+            : "Unbekannter Fehler",
       },
       { status: 500 }
     );
