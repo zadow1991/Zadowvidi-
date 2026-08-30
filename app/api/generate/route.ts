@@ -19,8 +19,13 @@ export async function POST() {
     const task = await client.imageToVideo
       .create({
         model: "gen4.5",
+
+        promptImage:
+          "https://upload.wikimedia.org/wikipedia/commons/8/85/Tour_Eiffel_Wikimedia_Commons_(cropped).jpg",
+
         promptText:
           "A cinematic western music video, dramatic desert landscape, lone cowboy, dynamic camera movement, cinematic lighting, realistic film look",
+
         ratio: "1280:720",
         duration: 5,
       })
